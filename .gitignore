@@ -1,5 +1,16 @@
 venv/
-data/
 __pycache__/
 *.pyc
-*.jsonl
+
+# Generated data — large scraped files
+data/wikipedia.jsonl
+data/news.jsonl
+data/common_crawl.jsonl
+data/mgosani_dataset.jsonl
+data/raw_georgian.jsonl
+data/instructions.jsonl
+data/train.jsonl
+data/val.jsonl
+data/synthetic_qa.jsonl
+
+# Eval prompts are versioned — do NOT ignore data/eval/

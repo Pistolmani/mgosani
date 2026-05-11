@@ -1,7 +1,7 @@
 """
 MGOSANI — Dataset Merger
 Combines all scraped JSONL files into one final dataset.
-Deduplicates and filters short texts.
+Deduplicates and filters short texts. Preserves source and license metadata.
 """
 
 import json
@@ -9,13 +9,18 @@ import hashlib
 from pathlib import Path
 
 DATA_DIR = Path(__file__).parent.parent / "data"
-OUTPUT_FILE = DATA_DIR / "mgosani_dataset.jsonl"
+OUTPUT_FILE = DATA_DIR / "raw_georgian.jsonl"
 
+# news.jsonl excluded — civil.ge/netgazeti ToS prohibits ML training use
 SOURCES = [
     "wikipedia.jsonl",
-    "news.jsonl",
     "common_crawl.jsonl",
 ]
+
+LICENSE_MAP = {
+    "wikipedia": "CC BY-SA 4.0",
+    "cc100": "Common Crawl Terms of Use",
+}
 
 MIN_LENGTH = 100  # minimum characters
 
@@ -43,14 +48,19 @@ def merge():
                             skipped += 1
                             continue
 
-                        # deduplicate by hash
                         h = hashlib.md5(text.encode()).hexdigest()
                         if h in seen:
                             skipped += 1
                             continue
                         seen.add(h)
 
-                        out.write(json.dumps({"text": text}, ensure_ascii=False) + "\n")
+                        source = record.get("source", source_file.replace(".jsonl", ""))
+                        out_record = {
+                            "text": text,
+                            "source": source,
+                            "license": LICENSE_MAP.get(source, "unknown"),
+                        }
+                        out.write(json.dumps(out_record, ensure_ascii=False) + "\n")
                         count += 1
                         total += 1
                     except Exception:
