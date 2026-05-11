@@ -1,6 +1,7 @@
 venv/
 __pycache__/
 *.pyc
+CLAUDE.md
 
 # Generated data — large scraped files
 data/wikipedia.jsonl
